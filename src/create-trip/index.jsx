@@ -23,7 +23,7 @@ function CreateTrip() {
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // OSM search
+  // OSM search variables
   const [searchText, setSearchText] = useState('');
   const [suggestions, setSuggestions] = useState([]);
 
@@ -35,12 +35,10 @@ function CreateTrip() {
 
   const searchLocation = async (value) => {
     setSearchText(value);
-
     if (value.length < 3) {
       setSuggestions([]);
       return;
     }
-
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${value}`
     );
@@ -68,24 +66,54 @@ function CreateTrip() {
       .replace('{traveler}', formData.traveler)
       .replace('{budget}', formData.budget);
 
-    const result = await chatSession.sendMessage(FINAL_PROMPT);
-    setLoading(false);
+    try {
+      const result = await chatSession.sendMessage(FINAL_PROMPT);
+      
+      let responseText = result.response.text();
+      // Clean up markdown formatting
+      responseText = responseText.replace('```json', '').replace('```', '');
+      
+      console.log("AI Response:", responseText);
 
-    saveTrip(result.response.text());
+      saveTrip(responseText); 
+    } catch (error) {
+      console.error("Error generating trip:", error);
+      toast("Failed to generate trip. Please try again.");
+      setLoading(false);
+    } 
   };
 
   const saveTrip = async (TripData) => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    const docId = Date.now().toString();
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const docId = Date.now().toString();
+      
+      let parsedTripData;
+      
+      // 👇 KEY FIX: Try-Catch block specifically for JSON parsing
+      try {
+        parsedTripData = JSON.parse(TripData);
+      } catch (e) {
+        console.error("JSON Parsing Error:", e);
+        toast("Error: Trip Plan was too large/incomplete. Please try fewer days.");
+        setLoading(false);
+        return; 
+      }
 
-    await setDoc(doc(db, "AITrips", docId), {
-      userSelection: formData,
-      tripData: JSON.parse(TripData),
-      userEmail: user.email,
-      id: docId
-    });
+      await setDoc(doc(db, "AITrips", docId), {
+        userSelection: formData,
+        tripData: parsedTripData,
+        userEmail: user.email,
+        id: docId
+      });
 
-    navigate('/view-trip/' + docId);
+      setLoading(false); // Stop loading before navigating
+      navigate('/view-trip/' + docId);
+    } catch (error) {
+      console.error("Error saving trip:", error);
+      toast("Error saving trip data to database.");
+      setLoading(false);
+    }
   };
 
   const login = useGoogleLogin({
@@ -111,11 +139,12 @@ function CreateTrip() {
 
   return (
     <div className='sm:px-10 md:px-32 lg:px-56 px-5 mt-10'>
-      <h2 className='font-bold text-3xl'>Tell us your travel preferences</h2>
+      <h2 className='font-bold text-3xl'>Tell us your travel preferences 🏕️🌴</h2>
+      <p className='mt-3 text-gray-500 text-xl'>Just provide some basic information, and our trip planner will generate a customized itinerary based on your preferences.</p>
 
-      <div className='mt-10 flex flex-col gap-10'>
+      <div className='mt-20 flex flex-col gap-10'>
 
-        {/* Destination */}
+        {/* Destination Section with Mini Map */}
         <div>
           <h2 className='text-xl font-medium mb-2'>Destination</h2>
           <div className="relative">
@@ -125,14 +154,14 @@ function CreateTrip() {
               onChange={(e) => searchLocation(e.target.value)}
             />
             {suggestions.length > 0 && (
-              <div className="absolute bg-white border w-full z-50 rounded-md">
-                {suggestions.map(item => (
+              <div className="absolute bg-white border w-full z-50 rounded-md shadow-lg max-h-[200px] overflow-y-auto">
+                {suggestions.map((item, index) => (
                   <div
-                    key={item.place_id}
+                    key={index} 
                     className="p-2 hover:bg-gray-100 cursor-pointer"
                     onClick={() => {
                       setSearchText(item.display_name);
-                      setSuggestions([]);
+                      setSuggestions([]); 
                       handleInputChange('location', {
                         label: item.display_name,
                         lat: item.lat,
@@ -146,6 +175,22 @@ function CreateTrip() {
               </div>
             )}
           </div>
+
+          {/* Mini Map Preview */}
+          {formData?.location?.lat && (
+             <div className="mt-4 rounded-xl border overflow-hidden shadow-sm h-[200px] w-full bg-gray-50">
+                <iframe
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    scrolling="no"
+                    marginHeight="0"
+                    marginWidth="0"
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(formData.location.lon)-0.1}%2C${parseFloat(formData.location.lat)-0.1}%2C${parseFloat(formData.location.lon)+0.1}%2C${parseFloat(formData.location.lat)+0.1}&layer=mapnik&marker=${formData.location.lat}%2C${formData.location.lon}`}
+                ></iframe>
+             </div>
+          )}
+
         </div>
 
         {/* Days */}
@@ -166,8 +211,8 @@ function CreateTrip() {
               <div
                 key={index}
                 onClick={() => handleInputChange('budget', item.title)}
-                className={`p-4 border rounded-lg cursor-pointer
-                  ${formData.budget === item.title && 'border-black shadow-md'}`}
+                className={`p-4 border rounded-lg cursor-pointer hover:shadow-lg transition-all
+                  ${formData.budget === item.title && 'border-black shadow-md bg-gray-50'}`} 
               >
                 <h2 className='text-3xl'>{item.icon}</h2>
                 <h2 className='font-bold'>{item.title}</h2>
@@ -185,8 +230,8 @@ function CreateTrip() {
               <div
                 key={index}
                 onClick={() => handleInputChange('traveler', item.people)}
-                className={`p-4 border rounded-lg cursor-pointer
-                  ${formData.traveler === item.people && 'border-black shadow-md'}`}
+                className={`p-4 border rounded-lg cursor-pointer hover:shadow-lg transition-all
+                  ${formData.traveler === item.people && 'border-black shadow-md bg-gray-50'}`}
               >
                 <h2 className='text-3xl'>{item.icon}</h2>
                 <h2 className='font-bold'>{item.title}</h2>
@@ -199,19 +244,25 @@ function CreateTrip() {
       </div>
 
       <div className='my-10 flex justify-end'>
-        <Button onClick={onGenerateTrip} disabled={loading}>
-          {loading ? <AiOutlineLoading3Quarters className="animate-spin" /> : 'Generate Trip'}
+        <Button onClick={onGenerateTrip} disabled={loading} className="w-full md:w-auto">
+          {loading ? 
+            <><AiOutlineLoading3Quarters className="animate-spin mr-2" /> Generating Trip...</> 
+            : 'Generate Trip 🚀'
+          }
         </Button>
       </div>
 
-      {/* Login dialog */}
-      <Dialog open={openDialog}>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogDescription>
-              <Button onClick={login} className="w-full flex gap-3">
-                <FcGoogle /> Sign in with Google
-              </Button>
+              <div className="flex flex-col items-center gap-5">
+                <h2 className="font-bold text-lg mt-7">Sign In</h2>
+                <p>Sign in to the App with Google authentication securely</p>
+                <Button onClick={login} className="w-full flex gap-3 mt-5">
+                  <FcGoogle className="h-7 w-7" /> Sign in with Google
+                </Button>
+              </div>
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

@@ -14,14 +14,17 @@ import {
 } from "@/components/ui/dialog"
 import { FcGoogle } from "react-icons/fc";
 import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom'; // <--- 1. Import Link & useNavigate
 
 function Header() {
   const user = JSON.parse(localStorage.getItem('user'));
   const [openDialog, setOpenDialog] = useState(false);
+  
+  const navigate = useNavigate(); // <--- 2. Initialize Hook
 
   useEffect(() => {
     console.log(user)
-  })
+  }, [user]) // Added dependency array to stop infinite logging
 
   const login = useGoogleLogin({
     onSuccess: (res) => GetUserProfile(res),
@@ -38,33 +41,42 @@ function Header() {
       console.log(resp);
       localStorage.setItem('user', JSON.stringify(resp.data));
       setOpenDialog(false);
-      window.location.reload();
+      window.location.reload(); // Reloads to update header state
     }).catch((error) => {
       console.error("Error fetching user profile: ", error);
     });
   }
 
   return (
-    <div className='shadow-sm flex justify-between items-center px-6'>
-      <img src="/logo.svg" alt="Logo" />
+    <div className='p-2 shadow-sm flex justify-between items-center px-5'>
+      <Link to={'/'}> {/* Added Link to make logo clickable */}
+        <img src="/logo.svg" alt="Logo" />
+      </Link>
       <div>
         {user ?
           <div className='flex items-center gap-3'>
-            <a href="/create-trip">
-            <Button variant="outline" className="rounded-full">+ Create Trip</Button>
-            </a>
-            <a href="/my-trips">
-            <Button variant="outline" className="rounded-full">My Trips</Button>
-            </a>
+            
+            {/* Used Link instead of <a> for smoother navigation */}
+            <Link to="/create-trip">
+              <Button variant="outline" className="rounded-full">+ Create Trip</Button>
+            </Link>
+            
+            <Link to="/my-trips">
+              <Button variant="outline" className="rounded-full">My Trips</Button>
+            </Link>
+
             <Popover>
-              <PopoverTrigger>             
+              <PopoverTrigger className='bg-transparent p-0'>            
                 <img src={user?.picture} alt="" className='h-[35px] w-[35px] rounded-full' />
               </PopoverTrigger>
               <PopoverContent>
                 <h2 className='cursor-pointer' onClick={()=>{
                   googleLogout();
                   localStorage.clear();
-                  window.location.reload();
+                  
+                  // 👇 THIS IS THE FIX
+                  // Redirects to Home Page ("/") immediately
+                  window.location.href = "/"; 
                 }}>Logout</h2>
               </PopoverContent>
             </Popover>
@@ -72,12 +84,12 @@ function Header() {
           </div> : <Button onClick={()=>setOpenDialog(true)}>Sign In</Button>}
       </div>
 
-      <Dialog open={openDialog}>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogDescription>
               <img src="/logo.svg" alt="logo" width="100px" className='items-center' />
-              <h2 className='font-bold text-lg'>Sign In to check out your travel plan</h2>
+              <h2 className='font-bold text-lg mt-7'>Sign In to check out your travel plan</h2>
               <p>Sign in to the App with Google authentication securely</p>
               <Button
                 onClick={login}
