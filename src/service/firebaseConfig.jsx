@@ -5,13 +5,13 @@ import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
  
 const firebaseConfig = {
-  apiKey: "AIzaSyBzYcVpYklej-ryxUEL6ZikXR3ifP8vCw8",
-  authDomain: "quiz-application-4bec1.firebaseapp.com",
-  projectId: "quiz-application-4bec1",
-  storageBucket: "quiz-application-4bec1.firebasestorage.app",
-  messagingSenderId: "1011079646031",
-  appId: "1:1011079646031:web:a0eb3c379309097892133a",
-  measurementId: "G-ZYMDZZVSLQ"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
  
 export const app = initializeApp(firebaseConfig);
