@@ -3,17 +3,23 @@ import './App.css'
 import Hero from './components/custom/Hero'
 import CreateTrip from './create-trip/index.jsx'
 import ViewTrip from './view-trip/[tripId]/index.jsx'
-import MyTrips from './my-trips/index.jsx' // Import MyTrips
+import MyTrips from './my-trips/index.jsx' 
 import Header from './components/custom/Header'
 import { Toaster } from './components/ui/sonner.jsx'
 
 function App() {
   return (
     <>
-      {/* 1. The Router wraps EVERYTHING */}
-      <BrowserRouter>
+      {/* 👇 FIXED: Added 'future' prop to opt-in to v7 behaviors 
+         and silence the console warnings.
+      */}
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
       
-        {/* 2. Header is now inside the Router context */}
         <Header />
         
         <Toaster />

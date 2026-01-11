@@ -11,20 +11,18 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogTitle, 
 } from "@/components/ui/dialog"
 import { FcGoogle } from "react-icons/fc";
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom'; // <--- 1. Import Link & useNavigate
+import { useNavigate, Link } from 'react-router-dom';
 
 function Header() {
-  const user = JSON.parse(localStorage.getItem('user'));
+  // 1. Initialize State from LocalStorage (Lazy initialization)
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')));
   const [openDialog, setOpenDialog] = useState(false);
   
-  const navigate = useNavigate(); // <--- 2. Initialize Hook
-
-  useEffect(() => {
-    console.log(user)
-  }, [user]) // Added dependency array to stop infinite logging
+  const navigate = useNavigate();
 
   const login = useGoogleLogin({
     onSuccess: (res) => GetUserProfile(res),
@@ -39,24 +37,35 @@ function Header() {
       },
     }).then((resp) => {
       console.log(resp);
+      
+      // 2. Save to Storage AND State
       localStorage.setItem('user', JSON.stringify(resp.data));
+      setUser(resp.data); // This triggers the UI update immediately
       setOpenDialog(false);
-      window.location.reload(); // Reloads to update header state
+      
+      // No window.location.reload() needed!
     }).catch((error) => {
       console.error("Error fetching user profile: ", error);
     });
   }
 
+  const handleLogout = () => {
+      googleLogout();
+      localStorage.clear();
+      setUser(null); // Clears the user from state immediately
+      navigate("/"); // Smooth React Router navigation
+  };
+
   return (
     <div className='p-2 shadow-sm flex justify-between items-center px-5'>
-      <Link to={'/'}> {/* Added Link to make logo clickable */}
+      <Link to={'/'} className='flex items-center gap-2'>
         <img src="/logo.svg" alt="Logo" />
       </Link>
+      
       <div>
-        {user ?
+        {user ? (
           <div className='flex items-center gap-3'>
             
-            {/* Used Link instead of <a> for smoother navigation */}
             <Link to="/create-trip">
               <Button variant="outline" className="rounded-full">+ Create Trip</Button>
             </Link>
@@ -66,37 +75,49 @@ function Header() {
             </Link>
 
             <Popover>
-              <PopoverTrigger className='bg-transparent p-0'>            
-                <img src={user?.picture} alt="" className='h-[35px] w-[35px] rounded-full' />
+              <PopoverTrigger className='bg-transparent p-0 border-none outline-none'>            
+                <img 
+                    src={user?.picture} 
+                    alt="user profile" 
+                    className='h-[35px] w-[35px] rounded-full object-cover' 
+                />
               </PopoverTrigger>
               <PopoverContent>
-                <h2 className='cursor-pointer' onClick={()=>{
-                  googleLogout();
-                  localStorage.clear();
-                  
-                  // 👇 THIS IS THE FIX
-                  // Redirects to Home Page ("/") immediately
-                  window.location.href = "/"; 
-                }}>Logout</h2>
+                <h2 
+                    className='cursor-pointer font-medium text-red-500 hover:bg-slate-100 p-2 rounded' 
+                    onClick={handleLogout}
+                >
+                    Logout
+                </h2>
               </PopoverContent>
             </Popover>
 
-          </div> : <Button onClick={()=>setOpenDialog(true)}>Sign In</Button>}
+          </div>
+        ) : (
+            <Button onClick={()=>setOpenDialog(true)}>Sign In</Button>
+        )}
       </div>
 
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogDescription>
-              <img src="/logo.svg" alt="logo" width="100px" className='items-center' />
-              <h2 className='font-bold text-lg mt-7'>Sign In to check out your travel plan</h2>
-              <p>Sign in to the App with Google authentication securely</p>
-              <Button
-                onClick={login}
-                className="w-full mt-6 flex gap-4 items-center">
-                <FcGoogle className="h-7 w-7" />Sign in With Google
-              </Button>
-            </DialogDescription>
+            {/* Added DialogTitle for Accessibility compliance */}
+            <DialogTitle className="visibly-hidden"></DialogTitle> 
+            <div className="flex flex-col items-center">
+                <img src="/logo.svg" alt="logo" width="100px" />
+                <h2 className='font-bold text-lg mt-7'>Sign In to check out your travel plan</h2>
+                
+                {/* 3. Moved content OUT of DialogDescription to fix console warnings (cannot put div inside p) */}
+                <div className='text-gray-500 mt-2 text-center'>
+                    Sign in to the App with Google authentication securely
+                </div>
+
+                <Button
+                    onClick={login}
+                    className="w-full mt-6 flex gap-4 items-center">
+                    <FcGoogle className="h-7 w-7" />Sign in With Google
+                </Button>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>
