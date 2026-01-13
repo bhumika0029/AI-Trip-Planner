@@ -1,8 +1,15 @@
 # 🌍 AI Travel Planner
 
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Firebase](https://img.shields.io/badge/firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black)
+![Gemini AI](https://img.shields.io/badge/Google%20Gemini%20AI-8E75B2?style=for-the-badge&logo=google&logoColor=white)
+
 **Discover Your Next Adventure with AI: Personalized Itineraries at Your Fingertips.**
 
 An intelligent travel planning application that curates custom trip itineraries based on your interests, budget, and travel companions. Powered by **Google Gemini AI**, **OpenStreetMap**, and **Firebase**.
+
+### 🚀 [View Live Demo](https://ai-trip-planner-sigma-nine.vercel.app/)
 
 ![AI Travel Planner Screenshot](public/landing.png)
 
@@ -20,7 +27,7 @@ An intelligent travel planning application that curates custom trip itineraries 
 
 * **Frontend:** React.js (Vite)
 * **Styling:** Tailwind CSS, ShadCN UI
-* **AI Model:** Google Gemini 2.5 Flash
+* **AI Model:** Google Gemini 1.5 Flash
 * **Database & Auth:** Firebase (Firestore, Google Auth)
 * **Maps:** Leaflet / OpenStreetMap
 * **Icons:** Lucide React, React Icons
@@ -38,8 +45,8 @@ Follow these instructions to set up the project locally.
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-username/AI-Trip-Planner.git](https://github.com/bhumika0029/AI-Trip-Planner.git)
-    cd AI-Trip-Planner.git
+    git clone [https://github.com/bhumika0029/AI-Trip-Planner.git](https://github.com/bhumika0029/AI-Trip-Planner.git)
+    cd AI-Trip-Planner
     ```
 
 2.  **Install dependencies:**
@@ -61,6 +68,12 @@ Follow these instructions to set up the project locally.
     npm run dev
     ```
 
+## 📸 Screenshots
+
+| Landing Page | Trip Generation |
+|:---:|:---:|
+| <img src="public/landing.png" width="300" /> | *Add a screenshot of your trip view here* |
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -76,3 +89,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 This project is open source and available under the [MIT License](LICENSE).
 
 ---
+*Built with ❤️ by Bhumika*
