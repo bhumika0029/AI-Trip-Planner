@@ -45,7 +45,7 @@ Follow these instructions to set up the project locally.
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/bhumika0029/AI-Trip-Planner.git](https://github.com/bhumika0029/AI-Trip-Planner.git)
+    git clone [https://github.com/your-username/AI-Trip-Planner.git]|(https://github.com/bhumika0029/AI-Trip-Planner.git)
     cd AI-Trip-Planner
     ```
 
