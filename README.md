@@ -27,7 +27,7 @@ An intelligent travel planning application that curates custom trip itineraries 
 
 * **Frontend:** React.js (Vite)
 * **Styling:** Tailwind CSS, ShadCN UI
-* **AI Model:** Google Gemini 1.5 Flash
+* **AI Model:** Google Gemini 2.5 Flash
 * **Database & Auth:** Firebase (Firestore, Google Auth)
 * **Maps:** Leaflet / OpenStreetMap
 * **Icons:** Lucide React, React Icons
@@ -60,6 +60,7 @@ Follow these instructions to set up the project locally.
     VITE_GOOGLE_AUTH_CLIENT_ID=your_google_client_id
     VITE_GOOGLE_GEMINI_API_KEY=your_gemini_api_key
     VITE_FIREBASE_API_KEY=your_firebase_api_key
+    VITE_UNSPLASH_ACCESS_KEY=your_unsplach_api_key
     # Add other Firebase config keys as needed
     ```
 
@@ -70,8 +71,8 @@ Follow these instructions to set up the project locally.
 
 ## 📸 Screenshots
 
-| Landing Page | Trip Generation |
-|:---:|:---:|
+| Landing Page |
+|:---:|
 | <img src="public/landing.png" width="300" />
 
 ## 🤝 Contributing
@@ -88,5 +89,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is open source and available under the [MIT License](LICENSE).
 
----
-*Built with ❤️ by Bhumika*
