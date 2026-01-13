@@ -72,7 +72,7 @@ Follow these instructions to set up the project locally.
 
 | Landing Page | Trip Generation |
 |:---:|:---:|
-| <img src="public/landing.png" width="300" /> | *Add a screenshot of your trip view here* |
+| <img src="public/landing.png" width="300" />
 
 ## 🤝 Contributing
 
